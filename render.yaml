@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: easykash-loan-app
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: UPESIPAY_BASE_URL
+        value: https://api.pesipay.com
+      - key: UPESIPAY_API_KEY
+        sync: false
+      - key: UPESIPAY_MERCHANT_ID
+        sync: false
+      - key: UPESIPAY_CALLBACK_URL
+        sync: false

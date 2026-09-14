@@ -1,0 +1,27 @@
+{
+  "name": "easykash-loan-app",
+  "version": "1.0.0",
+  "description": "EasyKash - Complete Instant Mobile Loans & M-Pesa Disbursal Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Build finished'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "keywords": [
+    "easykash",
+    "loan-app",
+    "m-pesa",
+    "fintech",
+    "kenya-loans",
+    "micro-finance"
+  ],
+  "author": "EasyKash",
+  "license": "MIT"
+}

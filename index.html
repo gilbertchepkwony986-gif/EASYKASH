@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyKash — Instant Mobile Loans Disbursed to M-PESA</title>
+    
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>"/>
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/animation.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div class="loader-wrapper">
+        <div class="custom-spinner"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="app-nav">
+        <div class="nav-container">
+            <a href="#apply" class="nav-brand">
+                <i class="fa fa-bolt text-primary"></i> EasyKash
+                <span class="brand-badge">Loans</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="#apply" class="nav-link-item active"><i class="fa fa-hand-holding-dollar me-1"></i> Apply</a></li>
+                <li><a href="#withdraw-loan" class="nav-link-item"><i class="fa fa-money-bill-transfer me-1"></i> Withdraw Loan</a></li>
+                <li><a href="#check-status" class="nav-link-item"><i class="fa fa-search me-1"></i> Check Status</a></li>
+                <li><a href="#calculator" class="nav-link-item"><i class="fa fa-calculator me-1"></i> Calculator</a></li>
+                <li><a href="#repay" class="nav-link-item"><i class="fa fa-receipt me-1"></i> Repay Loan</a></li>
+                <li><a href="#admin" class="nav-link-item"><i class="fa fa-lock me-1"></i> Admin</a></li>
+                <li><a href="#withdraw-loan" class="nav-link-item btn-nav-primary"><i class="fa fa-wallet me-1"></i> Instant Cash</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main id="app-content">
+
+        <!-- ==================== VIEW 1: APPLY (HOMEPAGE) ==================== -->
+        <div id="view-apply" class="app-view">
+            <section class="sign-up-form">
+                <div class="container">
+                    <div class="wrapper">
+                        <div class="sign-up-form-inner">
+                            <div class="row align-items-center">
+                                
+                                <!-- Left Column: Hero & Copy -->
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="brand-name">
+                                        <a href="#apply">EasyKash App</a>
+                                    </div>
+
+                                    <div class="about">
+                                        <h1>Instant Mobile Loans</h1>
+                                        <p>Let us help you sort your expenses — top up a loan, rental loan, car loan, educational or emergencies directly to M-PESA.</p>
+                                        
+                                        <div class="hero-highlights">
+                                            <div class="highlight-chip">
+                                                <i class="fa fa-check-circle"></i> No CRB Check
+                                            </div>
+                                            <div class="highlight-chip">
+                                                <i class="fa fa-check-circle"></i> No Guarantors
+                                            </div>
+                                            <div class="highlight-chip">
+                                                <i class="fa fa-check-circle"></i> Disbursed to M-PESA
+                                            </div>
+                                            <div class="highlight-chip">
+                                                <i class="fa fa-check-circle"></i> 100% Paperless
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Loan Application Card -->
+                                <div class="col-lg-6 col-md-12 mt-4 mt-lg-0">
+                                    <div class="reg-form">
+                                        <div class="wrapper">
+                                            <h3>Find Your Loan Eligibility</h3>
+                                            <span class="subtitle-alert">
+                                                <i class="fa fa-gift me-1"></i> You can qualify for Ksh. 5,000 - 50,000 loan to M-PESA
+                                            </span>
+
+                                            <form id="form-loan-apply">
+                                                <!-- Name -->
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-user"></i>
+                                                    <input type="text" name="name" placeholder="Your Full Name" required autocomplete="name">
+                                                </div>
+
+                                                <!-- M-Pesa Phone -->
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-phone"></i>
+                                                    <input type="tel" name="phone_number" placeholder="M-Pesa Phone Number (e.g. 0712345678)" required autocomplete="tel">
+                                                </div>
+
+                                                <!-- National ID -->
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-id-card"></i>
+                                                    <input type="number" name="id_number" placeholder="National ID Number" required autocomplete="off">
+                                                </div>
+
+                                                <!-- Loan Type -->
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-list"></i>
+                                                    <select name="loan_type" required>
+                                                        <option value="">Select Loan Type</option>
+                                                        <option value="Car Loan">Car Loan</option>
+                                                        <option value="Education Loan">Education Loan</option>
+                                                        <option value="Emergency Loan">Emergency Loan</option>
+                                                        <option value="Rental Loan">Rental Loan</option>
+                                                        <option value="Business Growth Loan">Business Growth Loan</option>
+                                                        <option value="Salary Advance">Salary Advance</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="trust-features">
+                                                    <span><small>✓ No CRB Check &bull; ✓ No Guarantors &bull; ✓ Instant M-PESA &bull; ✓ Zero Paperwork</small></span>
+                                                </div>
+
+                                                <div class="reg-button">
+                                                    <button type="submit" class="sign-up pulse-button">
+                                                        <i class="fa fa-magnifying-glass"></i> Find Your Loan Eligibility
+                                                    </button>
+                                                    <a href="#withdraw-loan" class="btn-secondary-custom">
+                                                        <i class="fa fa-money-bill-wave"></i> Withdraw Loan
+                                                    </a>
+                                                </div>
+
+                                                <div class="terms-label">
+                                                    By submitting you confirm that you accept the 
+                                                    <a data-bs-toggle="modal" data-bs-target="#terms">Terms and Conditions</a> and 
+                                                    <a data-bs-toggle="modal" data-bs-target="#policy">Privacy Policy</a>
+                                                </div>
+                                            </form>
+
+                                            <div class="copyright">
+                                                Protected by reCAPTCHA and subject to the Google 
+                                                <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> and 
+                                                <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <div class="container">
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-6 col-md-3 stat-item">
+                            <h2>500K+</h2>
+                            <p>Active Users in Kenya</p>
+                        </div>
+                        <div class="col-6 col-md-3 stat-item">
+                            <h2>98%</h2>
+                            <p>Customer Satisfaction</p>
+                        </div>
+                        <div class="col-6 col-md-3 stat-item">
+                            <h2>24/7</h2>
+                            <p>Instant Support</p>
+                        </div>
+                        <div class="col-6 col-md-3 stat-item">
+                            <h2>2M+</h2>
+                            <p>Loans Disbursed to M-PESA</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature Benefits Section -->
+            <section class="features-section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Why Millions Choose EasyKash</h2>
+                        <p>Fast, transparent, and hassle-free mobile micro-loans built specifically for your day-to-day financial needs.</p>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <div class="feature-icon-wrapper">
+                                    <i class="fa fa-bolt"></i>
+                                </div>
+                                <h4>Instant M-PESA Disbursal</h4>
+                                <p>Once approved, your funds are sent straight to your registered Safaricom M-Pesa line within minutes.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <div class="feature-icon-wrapper">
+                                    <i class="fa fa-shield-halved"></i>
+                                </div>
+                                <h4>No Collateral Required</h4>
+                                <p>Borrow with peace of mind without needing logbooks, land titles, or third-party guarantors.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <div class="feature-icon-wrapper">
+                                    <i class="fa fa-calendar-check"></i>
+                                </div>
+                                <h4>Flexible Repayment</h4>
+                                <p>Enjoy comfortable 30-day to 90-day loan terms with low, competitive interest rates.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== VIEW 2: WITHDRAW LOAN ==================== -->
+        <div id="view-withdraw-loan" class="app-view d-none">
+            <section class="sign-up-form">
+                <div class="container">
+                    <div class="wrapper">
+                        <div class="sign-up-form-inner">
+                            <div class="row align-items-center">
+                                
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="brand-name">
+                                        <a href="#apply">EasyKash App</a>
+                                    </div>
+                                    <div class="about">
+                                        <h1>Withdraw Your Loan</h1>
+                                        <p>Already qualified or have an approved loan limit? Enter your details below to withdraw your funds straight to M-PESA.</p>
+                                        
+                                        <div class="hero-highlights">
+                                            <div class="highlight-chip"><i class="fa fa-clock"></i> Disbursal in 2 Minutes</div>
+                                            <div class="highlight-chip"><i class="fa fa-shield-check"></i> 100% Encrypted</div>
+                                            <div class="highlight-chip"><i class="fa fa-mobile-screen"></i> Direct to M-PESA</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12 mt-4 mt-lg-0">
+                                    <div class="reg-form">
+                                        <div class="wrapper">
+                                            <h3>Withdraw Loan</h3>
+                                            <span class="subtitle-alert">
+                                                <i class="fa fa-check-circle me-1"></i> You can withdraw Ksh. 5,000 - 50,000 to M-PESA
+                                            </span>
+
+                                            <form id="form-loan-withdraw">
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-user"></i>
+                                                    <input type="text" name="name" placeholder="Your Full Name" required autocomplete="name">
+                                                </div>
+
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-id-card"></i>
+                                                    <input type="number" name="id_number" placeholder="National ID Number" required autocomplete="off">
+                                                </div>
+
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-coins"></i>
+                                                    <input type="number" name="amount" placeholder="Enter amount to withdraw (e.g. 25000)" min="1000" max="50000" required>
+                                                </div>
+
+                                                <div class="input-group-custom">
+                                                    <i class="fa fa-phone"></i>
+                                                    <input type="tel" name="phone_number" placeholder="Specify Mpesa Phone Number" required autocomplete="tel">
+                                                </div>
+
+                                                <div class="trust-features">
+                                                    <span><small>✓ No CRB Check &bull; ✓ No Guarantors &bull; ✓ Disbursed to MPESA &bull; ✓ No Paperwork</small></span>
+                                                </div>
+
+                                                <div class="reg-button">
+                                                    <button type="submit" class="sign-up pulse-button">
+                                                        <i class="fa fa-paper-plane"></i> Withdraw Now
+                                                    </button>
+                                                    <a href="#apply" class="btn-secondary-custom">
+                                                        <i class="fa fa-arrow-left"></i> Check Eligibility Instead
+                                                    </a>
+                                                </div>
+
+                                                <div class="terms-label">
+                                                    By submitting you confirm that you accept the 
+                                                    <a data-bs-toggle="modal" data-bs-target="#terms">Terms and Conditions</a> and 
+                                                    <a data-bs-toggle="modal" data-bs-target="#policy">Privacy Policy</a>
+                                                </div>
+                                            </form>
+
+                                            <div class="copyright">
+                                                Protected by reCAPTCHA and subject to the Google 
+                                                <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> and 
+                                                <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== VIEW 3: CHECK LOAN STATUS ==================== -->
+        <div id="view-check-status" class="app-view d-none">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-9">
+                        <div class="card p-4 p-md-5 border-0 shadow-sm rounded-4">
+                            <div class="text-center mb-4">
+                                <div class="approval-icon-circle" style="background: rgba(86, 79, 249, 0.1); color: var(--primary-color); border-color: rgba(86, 79, 249, 0.2);">
+                                    <i class="fa fa-search"></i>
+                                </div>
+                                <h3 class="fw-bold">Track Your Loan Status</h3>
+                                <p class="text-muted">Enter your National ID Number or registered M-Pesa Phone to check your active loan, balance, and repayment schedule.</p>
+                            </div>
+
+                            <form id="form-check-status">
+                                <div class="input-group-custom mb-3">
+                                    <i class="fa fa-id-card"></i>
+                                    <input type="text" id="status-search-query" placeholder="Enter National ID or Phone Number" required style="height: 55px; border-radius: 14px; padding-left: 48px; width: 100%; border: 1.5px solid #cbd5e1;">
+                                </div>
+                                <button type="submit" class="btn-primary-custom w-100">
+                                    <i class="fa fa-magnifying-glass"></i> Check Loan Status
+                                </button>
+                            </form>
+
+                            <div id="status-result-card" class="mt-4 d-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 4: REPAY LOAN ==================== -->
+        <div id="view-repay" class="app-view d-none">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-9">
+                        <div class="card p-4 p-md-5 border-0 shadow-sm rounded-4">
+                            <div class="text-center mb-4">
+                                <div class="approval-icon-circle" style="background: #e6fffa; color: #16a34a; border-color: #bbf7d0;">
+                                    <i class="fa fa-money-bill-transfer"></i>
+                                </div>
+                                <h3 class="fw-bold">Repay Loan via M-PESA</h3>
+                                <p class="text-muted">Pay on time to increase your EasyKash loan limit up to Ksh 100,000!</p>
+                            </div>
+
+                            <div class="p-3 mb-4 rounded-3" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">M-Pesa Paybill Number:</span>
+                                    <strong class="text-dark">400200</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Account Number:</span>
+                                    <strong class="text-dark">Your National ID Number</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Instant Processing:</span>
+                                    <span class="badge bg-success">Automated Clearance</span>
+                                </div>
+                            </div>
+
+                            <form id="form-loan-repay">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-muted">M-PESA Phone Number</label>
+                                    <input type="tel" name="repay_phone" class="form-control" placeholder="07xxxxxxxx" required style="height: 50px; border-radius: 12px;">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-muted">Amount to Repay (KSH)</label>
+                                    <input type="number" name="repay_amount" class="form-control" placeholder="Enter repayment amount" min="100" required style="height: 50px; border-radius: 12px;">
+                                </div>
+
+                                <button type="submit" class="btn-primary-custom w-100">
+                                    <i class="fa fa-mobile-screen"></i> Trigger STK Push Repayment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 5: LOAN CALCULATOR ==================== -->
+        <div id="view-calculator" class="app-view d-none">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="section-title text-center mb-5">
+                            <h2>Interactive Loan Calculator</h2>
+                            <p>Calculate your estimated monthly repayment and interest transparently before applying.</p>
+                        </div>
+
+                        <div class="row g-4 align-items-center">
+                            <div class="col-lg-7">
+                                <div class="card p-4 p-md-5 border-0 shadow-sm rounded-4">
+                                    <!-- Amount Slider -->
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="fw-bold text-dark">Loan Amount</label>
+                                            <span id="calc-amount-display" class="badge bg-primary fs-6 px-3 py-2">Ksh 25,000</span>
+                                        </div>
+                                        <input type="range" class="form-range" id="calc-amount-slider" min="5000" max="100000" step="1000" value="25000">
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span>Ksh 5,000</span>
+                                            <span>Ksh 50,000</span>
+                                            <span>Ksh 100,000</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Duration Slider -->
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="fw-bold text-dark">Repayment Period</label>
+                                            <span id="calc-duration-display" class="badge bg-secondary fs-6 px-3 py-2">1 Month (30 Days)</span>
+                                        </div>
+                                        <input type="range" class="form-range" id="calc-duration-slider" min="1" max="6" step="1" value="1">
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span>1 Month</span>
+                                            <span>3 Months</span>
+                                            <span>6 Months</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="#apply" class="btn-primary-custom w-100 text-decoration-none">
+                                            <i class="fa fa-hand-holding-dollar"></i> Apply for this Loan
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-5">
+                                <div class="card p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #1d3557, #457b9d); color: #fff;">
+                                    <h4 class="fw-bold mb-4">Repayment Summary</h4>
+                                    
+                                    <div class="d-flex justify-content-between py-2 border-bottom border-light border-opacity-25">
+                                        <span>Monthly Repayment:</span>
+                                        <strong id="calc-monthly-repayment" class="fs-5">Ksh 25,875</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between py-2 border-bottom border-light border-opacity-25">
+                                        <span>Total Interest:</span>
+                                        <strong id="calc-total-interest">Ksh 875</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between py-2 border-bottom border-light border-opacity-25">
+                                        <span>Total Repayment:</span>
+                                        <strong id="calc-total-repayment" class="fs-5 text-warning">Ksh 25,875</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between py-2">
+                                        <span>Interest APR Rate:</span>
+                                        <strong id="calc-apr-rate">42%</strong>
+                                    </div>
+
+                                    <div class="mt-4 p-3 rounded-3" style="background: rgba(255,255,255,0.1);">
+                                        <small class="d-block"><i class="fa fa-info-circle me-1"></i> No hidden penalties or upfront processing deductions.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 6: ADMIN DASHBOARD ==================== -->
+        <div id="view-admin" class="app-view d-none">
+            <div class="admin-wrapper">
+                <div class="container">
+                    
+                    <div class="admin-header-card">
+                        <div>
+                            <h3 class="fw-bold mb-1"><i class="fa fa-gauge-high text-primary me-2"></i> EasyKash Admin Console</h3>
+                            <p class="text-muted mb-0">Manage incoming loan applications, M-Pesa disbursements, and risk management.</p>
+                        </div>
+                        <button class="btn btn-primary-custom" onclick="EasyKashAdmin.fetchLoans()" style="height: 42px; width: auto; padding: 0 20px;">
+                            <i class="fa fa-rotate"></i> Refresh Data
+                        </button>
+                    </div>
+
+                    <!-- Stat Summary Cards -->
+                    <div class="row g-3">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-icon" style="background: rgba(86, 79, 249, 0.1); color: var(--primary-color);">
+                                    <i class="fa fa-file-invoice"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Total Applications</div>
+                                    <h4 id="admin-stat-total" class="fw-bold mb-0">12</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-icon" style="background: #def7ec; color: #03543f;">
+                                    <i class="fa fa-money-bill-wave"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Total Disbursed</div>
+                                    <h4 id="admin-stat-disbursed" class="fw-bold mb-0">Ksh 350,000</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-icon" style="background: #fef3c7; color: #92400e;">
+                                    <i class="fa fa-clock"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Pending Review</div>
+                                    <h4 id="admin-stat-pending" class="fw-bold mb-0">4</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-icon" style="background: #e1effe; color: #1e429f;">
+                                    <i class="fa fa-circle-check"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Approved Loans</div>
+                                    <h4 id="admin-stat-approved" class="fw-bold mb-0">8</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applications Table -->
+                    <div class="admin-table-card">
+                        <div class="admin-table-header">
+                            <h5 class="fw-bold mb-0">Recent Loan Applications & Disbursals</h5>
+                            <input type="text" id="admin-search-input" class="admin-search-input" placeholder="Search by name, ID, or phone...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Ref ID</th>
+                                        <th>Applicant Details</th>
+                                        <th>M-PESA Phone</th>
+                                        <th>Loan Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-loans-tbody">
+                                    <!-- Populated dynamically by admin.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Social Proof Toast -->
+    <div id="social-proof">
+        <div class="social-proof-avatar">
+            <i class="fa fa-money-bill-wave"></i>
+        </div>
+        <div class="social-proof-content">
+            <div id="title">
+                <span><span class="name">Titus</span> <span class="object text-muted ms-1">0756xxx322</span></span>
+                <span class="badge-disbursed">Disbursed</span>
+            </div>
+            <div id="description">
+                Received <span class="address">Ksh. 5,000</span> for <span class="course">Car Loan topup</span>
+            </div>
+            <div id="time"><i class="fa fa-clock me-1"></i><span class="time-counter">20</span>s Ago via M-PESA</div>
+        </div>
+    </div>
+
+    <!-- Chat Assistant FAB & Modal -->
+    <div class="chat-widget-fab" id="chat-widget-fab" title="Chat with EasyKash Assistant">
+        <i class="fa fa-comments"></i>
+    </div>
+
+    <div class="chat-modal-window" id="chat-modal-window">
+        <div class="chat-header">
+            <div class="d-flex align-items-center gap-2">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></div>
+                <h5>EasyKash Support</h5>
+            </div>
+            <button class="btn btn-sm text-white" id="btn-close-chat"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="chat-body" id="chat-messages-container">
+            <div class="chat-bubble bot">
+                Hello! Welcome to EasyKash Loan Support. How can we help you today?
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input-text" placeholder="Type a message...">
+            <button id="btn-send-chat"><i class="fa fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Eligibility Result Modal -->
+    <div class="modal fade" id="eligibilityResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header border-0 bg-light">
+                    <h5 class="modal-title fw-bold text-success"><i class="fa fa-circle-check me-2"></i> Loan Pre-Approved!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="approval-icon-circle">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Congratulations, <span id="modal-approved-name">Applicant</span>!</h4>
+                    <p class="text-muted small">Your credit profile qualifies for an instant M-Pesa loan.</p>
+
+                    <div class="approval-amount-badge">
+                        <div class="label">Approved Credit Limit</div>
+                        <div class="amount text-primary" id="modal-approved-amount">Ksh 35,000</div>
+                        <small class="text-muted">Disbursable directly to your M-PESA line</small>
+                    </div>
+
+                    <table class="loan-breakdown-table">
+                        <tr>
+                            <td>Reference ID:</td>
+                            <td id="modal-approved-ref">#EK-84920</td>
+                        </tr>
+                        <tr>
+                            <td>Target Phone:</td>
+                            <td id="modal-approved-phone">0712345678</td>
+                        </tr>
+                        <tr>
+                            <td>Loan Product:</td>
+                            <td id="modal-approved-type">Car Loan</td>
+                        </tr>
+                        <tr>
+                            <td>Repayment Term:</td>
+                            <td>30 Days (1 Month)</td>
+                        </tr>
+                        <tr>
+                            <td>Disbursement Method:</td>
+                            <td class="text-success"><i class="fa fa-bolt"></i> Instant M-PESA STK</td>
+                        </tr>
+                    </table>
+
+                    <button type="button" class="btn-primary-custom w-100 mt-2" onclick="EasyKashApp.proceedToWithdrawalFromModal()">
+                        <i class="fa fa-wallet"></i> Claim & Withdraw to M-PESA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- M-Pesa STK Push Simulation Modal -->
+    <div class="modal fade" id="stkPushModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 bg-transparent">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="d-flex justify-content-between align-items-center text-muted small mb-2">
+                            <span>Safaricom</span>
+                            <span><i class="fa fa-wifi"></i> <i class="fa fa-battery-full ms-1"></i></span>
+                        </div>
+
+                        <div class="phone-stk-prompt">
+                            <div class="mpesa-logo-text">M-PESA</div>
+                            <div class="badge bg-light text-primary border mb-2 px-2 py-1"><i class="fa fa-bolt me-1"></i> UpesiPay Gateway</div>
+                            <h6 class="fw-bold mb-2">EasyKash Verification</h6>
+                            <p class="small text-muted mb-3">
+                                Do you want to pay <span id="stk-prompt-amount" class="fw-bold text-dark">Ksh 95</span> to <strong>EASYKASH LTD</strong> for identity verification & disbursal to <span id="stk-prompt-phone" class="fw-bold text-dark">07xxxxxxxx</span>?
+                            </p>
+
+                            <input type="password" id="stk-pin-input" class="pin-input-mock" placeholder="••••" maxlength="4" autofocus>
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="btn-confirm-stk-pin" class="btn btn-success w-50 fw-bold" style="background: #16a34a;">Send PIN</button>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-muted small mt-3">
+                            <i class="fa fa-shield-alt text-success"></i> Secured by UpesiPay & Safaricom
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Success Modal -->
+    <div class="modal fade" id="withdrawalSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg p-4 text-center">
+                <div class="approval-icon-circle" style="background: #def7ec; color: #03543f;">
+                    <i class="fa fa-check-double"></i>
+                </div>
+                <h3 class="fw-bold mb-2">Disbursal Successful!</h3>
+                <p class="text-muted">
+                    Your loan of <strong id="success-disburse-amount" class="text-primary">Ksh 25,000</strong> has been approved and scheduled for instant release to M-PESA line <strong id="success-disburse-phone">07xxxxxxxx</strong>.
+                </p>
+                <div class="p-3 bg-light rounded-3 mb-4 text-start small">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>M-PESA Transaction ID:</span>
+                        <strong class="font-monospace">QK892XJ721</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Disbursal Status:</span>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Repayment Due:</span>
+                        <span>In 30 Days</span>
+                    </div>
+                </div>
+                <a href="#check-status" class="btn btn-primary-custom w-100" data-bs-dismiss="modal">
+                    <i class="fa fa-receipt"></i> View Loan Details
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms and Conditions Modal -->
+    <div class="modal fade" id="terms" tabindex="-1" aria-labelledby="termsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="termsLabel">Terms and Conditions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Loan facilities borrowed under this product will be hinged on pre-existing product features.</p>
+                    <p>In case of default of the USSD loans; the loan product facility shall be deemed to be in arrears and normal collection processes shall apply.</p>
+                    <p>The maximum loan amount: Ksh 50,000. A detail verification fee is paid by the borrower for identity verification and anti-fraud checks.</p>
+                    <p>Maximum Loan duration: Loan should be repayable in 1 Month (30 Days) from the day of borrowing, with renewal options available.</p>
+                    <p>Loan disbursement: Loan will be disbursed to the M-PESA number provided upon successful automated verification.</p>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Policy Modal -->
+    <div class="modal fade" id="policy" tabindex="-1" aria-labelledby="policyLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="policyLabel">Loan Privacy Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>We care about your privacy, data protection, and confidentiality. This Privacy Policy states what information we collect, for which purposes and means, and what your rights are.</p>
+                    <h6>When is this Privacy policy applicable?</h6>
+                    <p>This Privacy policy applies when:</p>
+                    <ul>
+                        <li>You use or have expressed the intention to use any of our mobile loan services;</li>
+                        <li>You provide details for M-PESA disbursement and identity validation;</li>
+                        <li>You contact our customer care or use our online application channels;</li>
+                        <li>You visit or interact with our web platform.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <h4><i class="fa fa-bolt text-primary"></i> EasyKash</h4>
+                        <p class="small text-muted">Kenya's reliable digital lending platform providing instant financial solutions directly to M-PESA.</p>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3">Quick Links</h6>
+                    <ul class="footer-links-list">
+                        <li><a href="#apply">Apply for Loan</a></li>
+                        <li><a href="#withdraw-loan">Withdraw Loan</a></li>
+                        <li><a href="#check-status">Loan Status</a></li>
+                        <li><a href="#calculator">Loan Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3">Loan Products</h6>
+                    <ul class="footer-links-list">
+                        <li><a href="#apply">Car Loan</a></li>
+                        <li><a href="#apply">Education Loan</a></li>
+                        <li><a href="#apply">Emergency Loan</a></li>
+                        <li><a href="#apply">Rental Loan</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-bold mb-3">Support & Legal</h6>
+                    <ul class="footer-links-list">
+                        <li><a data-bs-toggle="modal" data-bs-target="#terms" style="cursor: pointer;">Terms & Conditions</a></li>
+                        <li><a data-bs-toggle="modal" data-bs-target="#policy" style="cursor: pointer;">Privacy Policy</a></li>
+                        <li><a href="#admin">Admin Portal</a></li>
+                        <li><span class="text-muted small">24/7 Helpline: 0700-EASYKASH</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 EasyKash Kenya. All rights reserved. Disbursed via Safaricom M-PESA.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="/js/social-proof.js"></script>
+    <script src="/js/calculator.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

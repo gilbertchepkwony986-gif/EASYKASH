@@ -1,0 +1,93 @@
+/* Responsive CSS for EasyKash */
+
+@media (min-width: 1600px) {
+    .sign-up-form .container {
+        max-width: 1500px;
+    }
+}
+
+@media only screen and (min-device-width: 1200px) and (max-device-width: 1366px) {
+    .wrapper {
+        padding: 40px 20px;
+    }
+    .about h1 {
+        font-size: 52px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .about {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .about h1 {
+        font-size: 42px;
+    }
+    .hero-highlights {
+        justify-content: center;
+    }
+    .brand-name {
+        text-align: center;
+    }
+    .brand-name a::before {
+        display: none;
+    }
+    .reg-form {
+        margin-top: 20px;
+    }
+    .nav-links {
+        display: none;
+    }
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .sign-up-form {
+        padding: 20px 0 40px 0;
+    }
+    .about h1 {
+        font-size: 34px;
+    }
+    .about p {
+        font-size: 16px;
+    }
+    .reg-form .wrapper {
+        padding: 25px 20px;
+    }
+    .reg-form h3 {
+        font-size: 24px;
+    }
+    #social-proof {
+        min-width: 280px;
+        max-width: calc(100vw - 40px);
+        left: 20px;
+        right: 20px;
+    }
+    .stat-item h2 {
+        font-size: 28px;
+    }
+    .stat-item p {
+        font-size: 13px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .wrapper {
+        padding: 15px 10px;
+    }
+    .reg-form .wrapper {
+        padding: 20px 15px;
+    }
+    .reg-form form input,
+    .reg-form form select {
+        height: 50px;
+        font-size: 14px;
+        padding-left: 42px;
+    }
+    .about h1 {
+        font-size: 28px;
+    }
+}
