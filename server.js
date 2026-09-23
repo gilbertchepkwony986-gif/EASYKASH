@@ -1,5 +1,22 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
+
+// Auto-load .env file if present
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split('\n').forEach(line => {
+        const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+        if (match) {
+            const key = match[1];
+            let value = match[2] || '';
+            if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+            if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+            if (!process.env[key]) process.env[key] = value.trim();
+        }
+    });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
