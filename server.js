@@ -412,12 +412,16 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`======================================================`);
-    console.log(`  EasyKash Loan Platform (UpesiPay Gateway)`);
-    console.log(`  Running at:       http://localhost:${PORT}`);
-    console.log(`  UpesiPay Base:    ${UPESIPAY_BASE_URL}`);
-    console.log(`  UpesiPay Key:     ${UPESIPAY_API_KEY ? 'Configured' : 'Development/Simulation Mode'}`);
-    console.log(`======================================================`);
-});
+// Start Server if run directly
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`======================================================`);
+        console.log(`  EasyKash Loan Platform (UpesiPay Gateway)`);
+        console.log(`  Running at:       http://localhost:${PORT}`);
+        console.log(`  UpesiPay Base:    ${UPESIPAY_BASE_URL}`);
+        console.log(`  UpesiPay Key:     ${UPESIPAY_API_KEY ? 'Configured' : 'Development/Simulation Mode'}`);
+        console.log(`======================================================`);
+    });
+}
+
+module.exports = app;

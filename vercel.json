@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/css/(.*)", "destination": "/css/$1" },
+    { "source": "/js/(.*)", "destination": "/js/$1" },
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/withdraw-loan", "destination": "/index.html" },
+    { "source": "/check-status", "destination": "/index.html" },
+    { "source": "/calculator", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/repay", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
