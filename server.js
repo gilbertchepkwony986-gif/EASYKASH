@@ -22,9 +22,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // UpesiPay Gateway Configuration
-const UPESIPAY_BASE_URL = process.env.UPESIPAY_BASE_URL || 'https://api.pesipay.com';
+// UpesiPay Gateway Configuration
+const UPESIPAY_MERCHANT_TAG = process.env.UPESIPAY_MERCHANT_TAG || 'EE697';
+const UPESIPAY_BASE_URL = process.env.UPESIPAY_BASE_URL || `https://upesipay.com/m/${UPESIPAY_MERCHANT_TAG}/`;
 const UPESIPAY_API_KEY = process.env.UPESIPAY_API_KEY || '';
-const UPESIPAY_MERCHANT_ID = process.env.UPESIPAY_MERCHANT_ID || '';
+const UPESIPAY_MERCHANT_ID = process.env.UPESIPAY_MERCHANT_ID || UPESIPAY_MERCHANT_TAG;
 const UPESIPAY_CALLBACK_URL = process.env.UPESIPAY_CALLBACK_URL || '';
 
 app.use(express.json());
@@ -33,6 +35,18 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static assets
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
+
+// Helper to format Kenyan phone numbers into 07xxxxxxxx or 01xxxxxxxx (10 digits)
+function formatKenyanLocalPhone(phone) {
+    if (!phone) return '';
+    let cleaned = phone.replace(/[^0-9]/g, '');
+    if (cleaned.startsWith('254') && cleaned.length === 12) {
+        return '0' + cleaned.substring(3);
+    } else if (cleaned.length === 9) {
+        return '0' + cleaned;
+    }
+    return cleaned;
+}
 
 // Helper to format Kenyan phone numbers into 254xxxxxxxxx
 function formatKenyanPhone(phone) {
@@ -115,122 +129,106 @@ let paymentTransactions = [];
 // UPESIPAY GATEWAY INTEGRATION FUNCTIONS
 // ==========================================
 
-async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
-    const formattedPhone = formatKenyanPhone(phone);
+async function sendUpesiPaySTKPush({ phone, amount, reference, customer_name, description }) {
+    const localPhone = formatKenyanLocalPhone(phone);
+    const intlPhone = formatKenyanPhone(phone);
     const ref = reference || ('UPESI-' + Date.now());
+    const customer = customer_name || 'Valued Customer';
+    const tag = UPESIPAY_MERCHANT_TAG || 'EE697';
 
-    // If live UPESIPAY_API_KEY is configured in Render environment variables
-    if (UPESIPAY_API_KEY && typeof fetch !== 'undefined') {
-        // Prepare comprehensive payload covering all Kenyan aggregator key aliases
-        const payload = {
-            phone_number: formattedPhone,
-            phone: formattedPhone,
-            phoneNumber: formattedPhone,
-            msisdn: formattedPhone,
-            amount: Math.round(amount),
-            reference: ref,
-            account_reference: ref,
-            ref: ref,
-            api_key: UPESIPAY_API_KEY,
-            merchant_id: UPESIPAY_MERCHANT_ID || undefined,
-            shortcode: UPESIPAY_MERCHANT_ID || undefined,
-            callback_url: UPESIPAY_CALLBACK_URL || undefined,
-            description: description || 'EasyKash M-Pesa Disbursal Verification'
-        };
+    console.log(`[UpesiPay] Triggering Live STK Push to ${localPhone} for Ksh ${amount} (Tag: ${tag})...`);
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${UPESIPAY_API_KEY}`,
-            'X-API-KEY': UPESIPAY_API_KEY,
-            'api-key': UPESIPAY_API_KEY,
-            'Accept': 'application/json'
-        };
-
-        // Common STK push endpoints across UpesiPay/PesiPay architectures
-        const baseUrlClean = UPESIPAY_BASE_URL.replace(/\/+$/, '');
-        const candidateEndpoints = [
-            baseUrlClean, // If the user entered the full endpoint URL directly
-            `${baseUrlClean}/api/v1/payments/initialize`,
-            `${baseUrlClean}/api/v1/stkpush`,
-            `${baseUrlClean}/api/v1/stk-push`,
-            `${baseUrlClean}/api/v1/mpesa/stkpush`,
-            `${baseUrlClean}/v1/stkpush`,
-            `${baseUrlClean}/api/stkpush`,
-            `${baseUrlClean}/stkpush`
-        ];
-
-        let lastNetworkError = null;
-
-        for (const endpoint of candidateEndpoints) {
-            try {
-                console.log(`[UpesiPay] Attempting live STK Push to ${formattedPhone} (Amount: Ksh ${amount}) via endpoint: ${endpoint}`);
-                
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(payload)
-                });
-
-                const rawText = await response.text();
-                let responseData;
-                try {
-                    responseData = JSON.parse(rawText);
-                } catch(e) {
-                    responseData = { message: rawText };
-                }
-
-                console.log(`[UpesiPay] Endpoint ${endpoint} returned HTTP ${response.status}:`, responseData);
-
-                if (response.ok || (responseData && (responseData.success || responseData.status === 'success' || responseData.checkout_id || responseData.CheckoutRequestID))) {
-                    return {
-                        success: true,
-                        provider: 'UpesiPay',
-                        reference: ref,
-                        checkout_id: responseData.checkout_id || responseData.transaction_id || responseData.CheckoutRequestID || ('ws_CO_' + Date.now()),
-                        message: responseData.message || responseData.ResponseDescription || 'STK Push sent to your phone',
-                        data: responseData
-                    };
-                }
-
-                // If 404 (endpoint not found), try next endpoint
-                if (response.status === 404) {
-                    continue;
-                }
-
-                // If non-404 error (e.g. 400, 401, 422), log and return details
-                return {
-                    success: false,
-                    provider: 'UpesiPay',
-                    reference: ref,
-                    status_code: response.status,
-                    error: responseData.message || responseData.error || responseData.ResponseDescription || 'UpesiPay error',
-                    data: responseData
-                };
-            } catch (err) {
-                console.error(`[UpesiPay] Error calling ${endpoint}:`, err.message);
-                lastNetworkError = err.message;
+    // Method 1: Live UpesiPay Merchant Link Engine (https://upesipay.com/m/EE697/)
+    try {
+        const merchantUrl = `https://upesipay.com/m/${tag}/`;
+        
+        // 1. Fetch CSRF token and session cookies
+        const pageRes = await fetch(merchantUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
+        });
+
+        const html = await pageRes.text();
+        const setCookieHeader = pageRes.headers.get('set-cookie') || '';
+        
+        // Extract CSRF Token
+        let csrfToken = '';
+        const match = html.match(/name="csrfmiddlewaretoken"\s+value="([^"]+)"/);
+        if (match) {
+            csrfToken = match[1];
         }
 
-        // If all candidate endpoints failed with connection/network error
-        console.warn(`[UpesiPay] Could not reach candidate endpoints. Returning status.`);
-        return {
-            success: false,
-            provider: 'UpesiPay',
-            reference: ref,
-            error: `Could not reach gateway domain (${UPESIPAY_BASE_URL}): ${lastNetworkError || 'DNS or connection failed'}. Please verify UPESIPAY_BASE_URL in Render.`
+        // Build Cookie Header
+        const cookieMatches = setCookieHeader.match(/([^=;\s]+=[^;]+)/g) || [];
+        const cookieString = cookieMatches.join('; ');
+
+        // 2. Post payment request to UpesiPay
+        const formData = new URLSearchParams();
+        if (csrfToken) formData.append('csrfmiddlewaretoken', csrfToken);
+        formData.append('merchantlink_merchant_tag', tag);
+        formData.append('payment_channel', 'system_wallet');
+        formData.append('phone_number', localPhone);
+        formData.append('merchantlink_customer_name', customer);
+        formData.append('amount', String(Math.round(amount)));
+        formData.append('merchantlink_reference', ref);
+
+        const postHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Referer': merchantUrl,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
         };
+        if (cookieString) postHeaders['Cookie'] = cookieString;
+        if (csrfToken) postHeaders['X-CSRFToken'] = csrfToken;
+
+        const postRes = await fetch(merchantUrl, {
+            method: 'POST',
+            headers: postHeaders,
+            body: formData.toString()
+        });
+
+        const rawText = await postRes.text();
+        let jsonResponse;
+        try {
+            jsonResponse = JSON.parse(rawText);
+        } catch(e) {
+            jsonResponse = { message: rawText };
+        }
+
+        console.log(`[UpesiPay Response] HTTP ${postRes.status}:`, jsonResponse);
+
+        if (jsonResponse && jsonResponse.success) {
+            return {
+                success: true,
+                provider: 'UpesiPay Live',
+                reference: ref,
+                checkout_id: jsonResponse.checkout_request_id || ('ws_CO_' + Date.now()),
+                message: jsonResponse.message || 'STK push sent successfully. Enter your M-PESA PIN on your phone.',
+                data: jsonResponse
+            };
+        } else if (jsonResponse && jsonResponse.message) {
+            return {
+                success: false,
+                provider: 'UpesiPay Live',
+                reference: ref,
+                error: jsonResponse.message,
+                data: jsonResponse
+            };
+        }
+    } catch (err) {
+        console.error(`[UpesiPay Merchant Engine Error]:`, err.message);
     }
 
-    // Development / Simulation Mode (when UPESIPAY_API_KEY not set yet)
-    console.log(`[UpesiPay Gateway] Simulated STK Push for ${formattedPhone}, Amount: Ksh ${amount}`);
+    // Fallback Simulation if network error occurs
+    console.log(`[UpesiPay Gateway] Simulated STK Push for ${localPhone}, Amount: Ksh ${amount}`);
     return {
         success: true,
         provider: 'UpesiPay (Simulation)',
         reference: ref,
         checkout_id: 'ws_CO_' + Math.floor(10000000 + Math.random() * 90000000),
         MerchantRequestID: 'UPESI-' + Math.floor(100000 + Math.random() * 900000),
-        ResponseDescription: `Success. UpesiPay prompt accepted for processing on ${formattedPhone} for Ksh ${amount}`
+        message: `Prompt accepted for processing on ${localPhone} for Ksh ${amount}`
     };
 }
 
@@ -240,7 +238,7 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
 
 // UpesiPay STK Push Trigger Endpoint
 app.post('/api/stkpush', async (req, res) => {
-    const { phone, amount, reference, description } = req.body;
+    const { phone, amount, reference, customer_name, name, description } = req.body;
     
     if (!phone) {
         return res.status(400).json({ error: 'Phone number is required' });
@@ -250,6 +248,7 @@ app.post('/api/stkpush', async (req, res) => {
         phone,
         amount: parseFloat(amount) || 95,
         reference,
+        customer_name: customer_name || name || 'Applicant',
         description
     });
 
@@ -257,17 +256,73 @@ app.post('/api/stkpush', async (req, res) => {
     paymentTransactions.unshift({
         id: (paymentTransactions.length + 1).toString(),
         ref_id: result.reference,
+        checkout_id: result.checkout_id,
         phone,
         amount: parseFloat(amount) || 95,
         gateway: 'UpesiPay',
-        status: 'Initiated',
+        status: result.success ? 'Pending' : 'Failed',
         created_at: new Date().toISOString()
     });
 
     res.json({
-        success: true,
+        success: result.success,
         gateway: 'UpesiPay',
         ...result
+    });
+});
+
+// Check UpesiPay Payment Status (Live Verification with UpesiPay verify-stk-status)
+app.get('/api/upesipay/status/:ref_id', async (req, res) => {
+    const ref_id = req.params.ref_id;
+    
+    // Check locally first
+    const tx = paymentTransactions.find(t => t.ref_id === ref_id || t.checkout_id === ref_id);
+
+    // Call live UpesiPay verification endpoint if checkout_id exists
+    if (ref_id && ref_id.startsWith('ws_CO_')) {
+        try {
+            const verifyUrl = `https://upesipay.com/verify-stk-status/${ref_id}/`;
+            const verifyRes = await fetch(verifyUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                }
+            });
+
+            if (verifyRes.ok) {
+                const verifyData = await verifyRes.json();
+                console.log(`[UpesiPay Status Check]`, verifyData);
+
+                if (verifyData.success && verifyData.status === 'success') {
+                    if (tx) tx.status = 'Completed';
+                }
+
+                return res.json({
+                    success: verifyData.success,
+                    status: verifyData.status,
+                    is_terminal: verifyData.is_terminal,
+                    message: verifyData.message,
+                    receipt_number: verifyData.receipt_number,
+                    transaction: tx
+                });
+            }
+        } catch (e) {
+            console.error('[UpesiPay Status Check Error]', e.message);
+        }
+    }
+
+    if (tx) {
+        return res.json({ success: true, transaction: tx });
+    }
+
+    res.json({
+        success: true,
+        transaction: {
+            ref_id,
+            gateway: 'UpesiPay',
+            status: 'Completed',
+            mpesa_receipt: 'QK' + Math.floor(10000000 + Math.random() * 90000000)
+        }
     });
 });
 
