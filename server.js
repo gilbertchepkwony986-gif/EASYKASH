@@ -149,6 +149,7 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
         // Common STK push endpoints across UpesiPay/PesiPay architectures
         const baseUrlClean = UPESIPAY_BASE_URL.replace(/\/+$/, '');
         const candidateEndpoints = [
+            baseUrlClean, // If the user entered the full endpoint URL directly
             `${baseUrlClean}/api/v1/payments/initialize`,
             `${baseUrlClean}/api/v1/stkpush`,
             `${baseUrlClean}/api/v1/stk-push`,
@@ -157,6 +158,8 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
             `${baseUrlClean}/api/stkpush`,
             `${baseUrlClean}/stkpush`
         ];
+
+        let lastNetworkError = null;
 
         for (const endpoint of candidateEndpoints) {
             try {
@@ -205,6 +208,7 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
                 };
             } catch (err) {
                 console.error(`[UpesiPay] Error calling ${endpoint}:`, err.message);
+                lastNetworkError = err.message;
             }
         }
 
@@ -214,7 +218,7 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
             success: false,
             provider: 'UpesiPay',
             reference: ref,
-            error: 'Could not connect to UpesiPay API at ' + UPESIPAY_BASE_URL
+            error: `Could not reach gateway domain (${UPESIPAY_BASE_URL}): ${lastNetworkError || 'DNS or connection failed'}. Please verify UPESIPAY_BASE_URL in Render.`
         };
     }
 
