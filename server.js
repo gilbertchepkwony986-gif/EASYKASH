@@ -121,56 +121,108 @@ async function sendUpesiPaySTKPush({ phone, amount, reference, description }) {
 
     // If live UPESIPAY_API_KEY is configured in Render environment variables
     if (UPESIPAY_API_KEY && typeof fetch !== 'undefined') {
-        try {
-            console.log(`[UpesiPay] Initiating STK Push to ${formattedPhone} for Ksh ${amount} via ${UPESIPAY_BASE_URL}`);
-            
-            const payload = {
-                phone_number: formattedPhone,
-                amount: Math.round(amount),
-                reference: ref,
-                merchant_id: UPESIPAY_MERCHANT_ID || undefined,
-                callback_url: UPESIPAY_CALLBACK_URL || undefined,
-                description: description || 'EasyKash M-Pesa Disbursal Verification'
-            };
+        // Prepare comprehensive payload covering all Kenyan aggregator key aliases
+        const payload = {
+            phone_number: formattedPhone,
+            phone: formattedPhone,
+            phoneNumber: formattedPhone,
+            msisdn: formattedPhone,
+            amount: Math.round(amount),
+            reference: ref,
+            account_reference: ref,
+            ref: ref,
+            api_key: UPESIPAY_API_KEY,
+            merchant_id: UPESIPAY_MERCHANT_ID || undefined,
+            shortcode: UPESIPAY_MERCHANT_ID || undefined,
+            callback_url: UPESIPAY_CALLBACK_URL || undefined,
+            description: description || 'EasyKash M-Pesa Disbursal Verification'
+        };
 
-            const response = await fetch(`${UPESIPAY_BASE_URL}/api/v1/payments/initialize`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${UPESIPAY_API_KEY}`,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${UPESIPAY_API_KEY}`,
+            'X-API-KEY': UPESIPAY_API_KEY,
+            'api-key': UPESIPAY_API_KEY,
+            'Accept': 'application/json'
+        };
 
-            const responseData = await response.json();
-            console.log(`[UpesiPay] Response:`, responseData);
+        // Common STK push endpoints across UpesiPay/PesiPay architectures
+        const baseUrlClean = UPESIPAY_BASE_URL.replace(/\/+$/, '');
+        const candidateEndpoints = [
+            `${baseUrlClean}/api/v1/payments/initialize`,
+            `${baseUrlClean}/api/v1/stkpush`,
+            `${baseUrlClean}/api/v1/stk-push`,
+            `${baseUrlClean}/api/v1/mpesa/stkpush`,
+            `${baseUrlClean}/v1/stkpush`,
+            `${baseUrlClean}/api/stkpush`,
+            `${baseUrlClean}/stkpush`
+        ];
 
-            return {
-                success: response.ok,
-                provider: 'UpesiPay',
-                reference: ref,
-                checkout_id: responseData.checkout_id || responseData.transaction_id || ('ws_CO_' + Math.floor(10000000 + Math.random() * 90000000)),
-                data: responseData
-            };
-        } catch (error) {
-            console.error(`[UpesiPay] API Error:`, error.message);
-            // Return graceful fallback response
-            return {
-                success: true,
-                provider: 'UpesiPay (Simulation Fallback)',
-                reference: ref,
-                checkout_id: 'ws_CO_' + Math.floor(10000000 + Math.random() * 90000000),
-                message: 'STK push simulated: ' + error.message
-            };
+        for (const endpoint of candidateEndpoints) {
+            try {
+                console.log(`[UpesiPay] Attempting live STK Push to ${formattedPhone} (Amount: Ksh ${amount}) via endpoint: ${endpoint}`);
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = await response.text();
+                let responseData;
+                try {
+                    responseData = JSON.parse(rawText);
+                } catch(e) {
+                    responseData = { message: rawText };
+                }
+
+                console.log(`[UpesiPay] Endpoint ${endpoint} returned HTTP ${response.status}:`, responseData);
+
+                if (response.ok || (responseData && (responseData.success || responseData.status === 'success' || responseData.checkout_id || responseData.CheckoutRequestID))) {
+                    return {
+                        success: true,
+                        provider: 'UpesiPay',
+                        reference: ref,
+                        checkout_id: responseData.checkout_id || responseData.transaction_id || responseData.CheckoutRequestID || ('ws_CO_' + Date.now()),
+                        message: responseData.message || responseData.ResponseDescription || 'STK Push sent to your phone',
+                        data: responseData
+                    };
+                }
+
+                // If 404 (endpoint not found), try next endpoint
+                if (response.status === 404) {
+                    continue;
+                }
+
+                // If non-404 error (e.g. 400, 401, 422), log and return details
+                return {
+                    success: false,
+                    provider: 'UpesiPay',
+                    reference: ref,
+                    status_code: response.status,
+                    error: responseData.message || responseData.error || responseData.ResponseDescription || 'UpesiPay error',
+                    data: responseData
+                };
+            } catch (err) {
+                console.error(`[UpesiPay] Error calling ${endpoint}:`, err.message);
+            }
         }
+
+        // If all candidate endpoints failed with connection/network error
+        console.warn(`[UpesiPay] Could not reach candidate endpoints. Returning status.`);
+        return {
+            success: false,
+            provider: 'UpesiPay',
+            reference: ref,
+            error: 'Could not connect to UpesiPay API at ' + UPESIPAY_BASE_URL
+        };
     }
 
     // Development / Simulation Mode (when UPESIPAY_API_KEY not set yet)
     console.log(`[UpesiPay Gateway] Simulated STK Push for ${formattedPhone}, Amount: Ksh ${amount}`);
     return {
         success: true,
-        provider: 'UpesiPay',
+        provider: 'UpesiPay (Simulation)',
         reference: ref,
         checkout_id: 'ws_CO_' + Math.floor(10000000 + Math.random() * 90000000),
         MerchantRequestID: 'UPESI-' + Math.floor(100000 + Math.random() * 900000),

